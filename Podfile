@@ -1,4 +1,4 @@
-platform :osx, '10.10'
+platform :osx, '11.0'
 use_frameworks!
 
 target 'Clipy' do
@@ -30,4 +30,21 @@ target 'Clipy' do
 
   end
 
+end
+
+post_install do |installer|
+  swift_5_0_lib = "#{installer.sandbox.root}/../#{`xcrun --show-sdk-platform-path`.strip}/../usr/lib/swift-5.0/macosx"
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['MACOSX_DEPLOYMENT_TARGET'] = '11.0'
+    end
+    if ['Nimble', 'Quick'].include?(target.name)
+      target.build_configurations.each do |config|
+        paths = config.build_settings['LIBRARY_SEARCH_PATHS'] || ['$(inherited)']
+        xctest_lib = '$(DEVELOPER_DIR)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-5.0/$(PLATFORM_NAME)'
+        paths << xctest_lib unless paths.include?(xctest_lib)
+        config.build_settings['LIBRARY_SEARCH_PATHS'] = paths
+      end
+    end
+  end
 end
