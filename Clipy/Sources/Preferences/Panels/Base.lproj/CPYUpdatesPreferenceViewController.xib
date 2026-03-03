@@ -27,7 +27,7 @@
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                     <connections>
-                        <binding destination="BFl-Kb-QuK" name="value" keyPath="lastUpdateCheckDate" id="RZL-GJ-KxE"/>
+                        <binding destination="BFl-Kb-QuK" name="value" keyPath="updater.lastUpdateCheckDate" id="RZL-GJ-KxE"/>
                     </connections>
                 </textField>
                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bnR-ek-Gzp">
@@ -84,6 +84,6 @@
             <point key="canvasLocation" x="629" y="589"/>
         </customView>
         <userDefaultsController representsSharedInstance="YES" id="Z9l-MW-Uqh"/>
-        <customObject id="BFl-Kb-QuK" customClass="SUUpdater"/>
+        <customObject id="BFl-Kb-QuK" customClass="SPUStandardUpdaterController"/>
     </objects>
 </document>
