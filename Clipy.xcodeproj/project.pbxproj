@@ -17,6 +17,7 @@
 		AA000001000000000000006A /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = AA000001000000000000006B /* Sparkle */; };
 		AA000001000000000000007A /* Sauce in Frameworks */ = {isa = PBXBuildFile; productRef = AA000001000000000000007B /* Sauce */; };
 		AA000001000000000000008A /* KeyHolder in Frameworks */ = {isa = PBXBuildFile; productRef = AA000001000000000000008B /* KeyHolder */; };
+		AA0000010000000000000100 /* RealmSwift in Embed Frameworks */ = {isa = PBXBuildFile; productRef = AA0000010000000000000021 /* RealmSwift */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		AA000001000000000000009A /* Magnet in Frameworks */ = {isa = PBXBuildFile; productRef = AA000001000000000000009B /* Magnet */; };
 		AA00000100000000000000AA /* LoginServiceKit in Frameworks */ = {isa = PBXBuildFile; productRef = AA00000100000000000000AB /* LoginServiceKit */; };
 		AA00000100000000000000BA /* RxScreeen in Frameworks */ = {isa = PBXBuildFile; productRef = AA00000100000000000000BB /* RxScreeen */; };
@@ -114,6 +115,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				AA0000010000000000000100 /* RealmSwift in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;

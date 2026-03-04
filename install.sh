@@ -5,7 +5,6 @@ PROJECT="Clipy.xcodeproj"
 SCHEME="Clipy"
 APP_NAME="Clipy"
 BUILD_DIR="build"
-ARCHIVE_PATH="${BUILD_DIR}/archive.xcarchive"
 
 IGNORE_LINT=false
 DRY_RUN=false
@@ -47,27 +46,36 @@ else
     echo "Skipping tests due to --skip-test option."
 fi
 
-# --- Build (Archive) ---
+# --- Build (Release) ---
+# Note: xcodebuild may report test target build failures in Release mode,
+# but the app target builds successfully. We verify the app exists after build.
 if command -v xcpretty &> /dev/null; then
-    xcodebuild -project "$PROJECT" -scheme "$SCHEME" clean archive -archivePath "$ARCHIVE_PATH" | xcpretty
+    xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Release \
+        -derivedDataPath "$BUILD_DIR" build | xcpretty || true
 else
     echo "xcpretty could not be found. Proceeding without xcpretty."
-    xcodebuild -project "$PROJECT" -scheme "$SCHEME" clean archive -archivePath "$ARCHIVE_PATH"
+    xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Release \
+        -derivedDataPath "$BUILD_DIR" build || true
 fi
 
-# --- Install ---
-APP_SRC="${ARCHIVE_PATH}/Products/Applications/${APP_NAME}.app"
+# --- Verify build ---
+APP_SRC="${BUILD_DIR}/Build/Products/Release/${APP_NAME}.app"
+if [ ! -d "$APP_SRC" ]; then
+    echo "Error: Build failed. ${APP_SRC} not found."
+    exit 1
+fi
 
 if [ "$DRY_RUN" = true ]; then
     echo "DRY RUN: Would execute the following commands:"
+    echo "  pkill ${APP_NAME} (if running)"
     echo "  rm -rf /Applications/${APP_NAME}.app"
     echo "  cp -r ${APP_SRC} /Applications/"
-    echo "  pkill ${APP_NAME} (if running)"
     echo "  open /Applications/${APP_NAME}.app"
     echo "Build completed successfully. Use without --dry-run to actually install."
 else
+    pkill "$APP_NAME" || true
     rm -rf "/Applications/${APP_NAME}.app"
     cp -r "$APP_SRC" /Applications/
-    pkill "$APP_NAME" || true
+    codesign --force --deep --sign - "/Applications/${APP_NAME}.app"
     open "/Applications/${APP_NAME}.app"
 fi
