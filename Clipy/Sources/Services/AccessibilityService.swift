@@ -1,12 +1,12 @@
-// 
+//
 //  AccessibilityService.swift
 //
 //  Clipy
 //  GitHub: https://github.com/clipy
 //  HP: https://clipy-app.com
-// 
+//
 //  Created by Econa77 on 2018/10/03.
-// 
+//
 //  Copyright © 2015-2018 Clipy Project.
 //
 
