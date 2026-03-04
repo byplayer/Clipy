@@ -125,7 +125,7 @@ extension ClipService {
 
         // Overwrite same history
         let isOverwriteHistory = AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.overwriteSameHistory)
-        let savedHash = (isOverwriteHistory) ? data.hash : Int(arc4random() % 1000000)
+        let savedHash = (isOverwriteHistory) ? data.hash : Int.random(in: 0..<1000000)
 
         // Saved time and path
         let unixTime = Int(Date().timeIntervalSince1970)
@@ -152,7 +152,8 @@ extension ClipService {
             // Save Realm and .data file
             let dispatchRealm = try! Realm()
             if CPYUtilities.prepareSaveToPath(CPYUtilities.applicationSupportFolder()) {
-                if NSKeyedArchiver.archiveRootObject(data, toFile: savedPath) {
+                if let archivedData = try? NSKeyedArchiver.archivedData(withRootObject: data, requiringSecureCoding: false),
+                   (try? archivedData.write(to: URL(fileURLWithPath: savedPath))) != nil {
                     dispatchRealm.transaction {
                         dispatchRealm.add(clip, update: .all)
                     }

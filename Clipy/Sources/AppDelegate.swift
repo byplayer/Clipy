@@ -185,7 +185,6 @@ extension AppDelegate: NSApplicationDelegate {
 
         // Sparkle
         let updater = updaterController.updater
-        updater.setFeedURL(Constants.Application.appcastURL)
         updater.automaticallyChecksForUpdates = AppEnvironment.current.defaults.bool(forKey: Constants.Update.enableAutomaticCheck)
         updater.updateCheckInterval = TimeInterval(AppEnvironment.current.defaults.integer(forKey: Constants.Update.checkInterval))
         updaterController.startUpdater()

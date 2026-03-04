@@ -4,11 +4,16 @@ import Magnet
 import Carbon
 @testable import Clipy
 
-// swiftlint:disable function_body_length
-
 class HotKeyServiceSpec: QuickSpec {
     override func spec() {
+        describeMigrateHotKey()
+        describeSaveHotKey()
+        describeKeyCombos()
+        describeClearHistoryHotKey()
+        describeFolderHotKey()
+    }
 
+    private func describeMigrateHotKey() {
         describe("Migrate HotKey") {
 
             beforeEach {
@@ -98,7 +103,9 @@ class HotKeyServiceSpec: QuickSpec {
                 defaults.synchronize()
             }
         }
+    }
 
+    private func describeSaveHotKey() {
         describe("Save HotKey") {
 
             beforeEach {
@@ -207,7 +214,9 @@ class HotKeyServiceSpec: QuickSpec {
                 defaults.synchronize()
             }
         }
+    }
 
+    private func describeKeyCombos() {
         describe("Key comobos") {
             it("Default key combos") {
                 let keyCombos = HotKeyService.defaultKeyCombos
@@ -225,7 +234,9 @@ class HotKeyServiceSpec: QuickSpec {
                 expect(snippetCombos?["modifiers"]) == 768
             }
         }
+    }
 
+    private func describeClearHistoryHotKey() {
         describe("Clear History HotKey") {
             beforeEach {
                 let defaults = UserDefaults.standard
@@ -245,7 +256,10 @@ class HotKeyServiceSpec: QuickSpec {
                 expect(service.clearHistoryKeyCombo) == keyCombo
 
                 let savedData = UserDefaults.standard.object(forKey: Constants.HotKey.clearHistoryKeyCombo) as? Data
-                let savedKeyCombo = NSKeyedUnarchiver.unarchiveObject(with: savedData!) as? KeyCombo
+                let unarchiver = try! NSKeyedUnarchiver(forReadingFrom: savedData!)
+                unarchiver.requiresSecureCoding = false
+                let savedKeyCombo = unarchiver.decodeObject(forKey: NSKeyedArchiveRootObjectKey) as? KeyCombo
+                unarchiver.finishDecoding()
                 expect(savedKeyCombo) == keyCombo
 
                 service.changeClearHistoryKeyCombo(nil)
@@ -258,7 +272,9 @@ class HotKeyServiceSpec: QuickSpec {
                 defaults.synchronize()
             }
         }
+    }
 
+    private func describeFolderHotKey() {
         describe("Folder HotKey") {
             beforeEach {
                 let defaults = UserDefaults.standard
