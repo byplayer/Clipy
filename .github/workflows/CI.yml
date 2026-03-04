@@ -12,4 +12,4 @@ jobs:
       run: brew install swiftlint swiftgen bartycrouch
 
     - name: Run tests
-      run: xcodebuild test -project Clipy.xcodeproj -scheme Clipy -verbose -clean
+      run: xcodebuild clean test -project Clipy.xcodeproj -scheme Clipy -verbose
