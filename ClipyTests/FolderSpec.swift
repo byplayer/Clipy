@@ -4,14 +4,18 @@ import Nimble
 import RealmSwift
 @testable import Clipy
 
-// swiftlint:disable function_body_length
 class FolderSpec: QuickSpec {
     override func spec() {
-
         beforeEach {
             Realm.Configuration.defaultConfiguration.inMemoryIdentifier = NSUUID().uuidString
         }
 
+        describeCreateNew()
+        describeSyncDatabase()
+        describeRearrangeIndex()
+    }
+
+    private func describeCreateNew() {
         describe("Create new") {
 
             it("deep copy object") {
@@ -82,7 +86,9 @@ class FolderSpec: QuickSpec {
             }
 
         }
+    }
 
+    private func describeSyncDatabase() {
         describe("Sync database") {
 
             it("Merge snippet") {
@@ -192,7 +198,9 @@ class FolderSpec: QuickSpec {
             }
 
         }
+    }
 
+    private func describeRearrangeIndex() {
         describe("Rearrange Index") {
 
             it("Rearrange folder index") {
@@ -244,6 +252,5 @@ class FolderSpec: QuickSpec {
             }
 
         }
-
     }
 }

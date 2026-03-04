@@ -65,8 +65,8 @@ final class DataCleanService {
         guard let paths = try? fileManager.contentsOfDirectory(atPath: CPYUtilities.applicationSupportFolder()) else { return }
 
         let allClipPaths = Array(realm.objects(CPYClip.self)
-            .filter { !$0.isInvalidated }
-            .compactMap { $0.dataPath.components(separatedBy: "/").last })
+                                    .filter { !$0.isInvalidated }
+                                    .compactMap { $0.dataPath.components(separatedBy: "/").last })
 
         // Delete diff datas
         DispatchQueue.main.async {

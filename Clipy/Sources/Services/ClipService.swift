@@ -16,6 +16,7 @@ import RealmSwift
 import PINCache
 import RxSwift
 import RxCocoa
+import AEXML
 
 final class ClipService {
 
@@ -112,7 +113,7 @@ extension ClipService {
         save(with: data)
     }
 
-    fileprivate func save(with data: CPYClipData) {
+    func save(with data: CPYClipData) {
         let realm = try! Realm()
         // Copy already copied history
         let isCopySameHistory = AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.copySameHistory)
@@ -125,7 +126,7 @@ extension ClipService {
 
         // Overwrite same history
         let isOverwriteHistory = AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.overwriteSameHistory)
-        let savedHash = (isOverwriteHistory) ? data.hash : Int(arc4random() % 1000000)
+        let savedHash = (isOverwriteHistory) ? data.hash : Int.random(in: 0..<1000000)
 
         // Saved time and path
         let unixTime = Int(Date().timeIntervalSince1970)
@@ -152,7 +153,8 @@ extension ClipService {
             // Save Realm and .data file
             let dispatchRealm = try! Realm()
             if CPYUtilities.prepareSaveToPath(CPYUtilities.applicationSupportFolder()) {
-                if NSKeyedArchiver.archiveRootObject(data, toFile: savedPath) {
+                if let archivedData = try? NSKeyedArchiver.archivedData(withRootObject: data, requiringSecureCoding: false),
+                   (try? archivedData.write(to: URL(fileURLWithPath: savedPath))) != nil {
                     dispatchRealm.transaction {
                         dispatchRealm.add(clip, update: .all)
                     }
@@ -171,5 +173,49 @@ extension ClipService {
         guard let value = dictionary[type] else { return false }
         guard let number = storeTypes[value] else { return false }
         return number.boolValue
+    }
+}
+
+// MARK: - Import / Export
+extension ClipService {
+    func exportClipboard() -> AEXMLDocument {
+        let realm = try! Realm()
+        let maxHistory = AppEnvironment.current.defaults.integer(forKey: Constants.UserDefaults.maxHistorySize)
+        let ascending = !AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.reorderClipsAfterPasting)
+        let clips = realm.objects(CPYClip.self).sorted(byKeyPath: #keyPath(CPYClip.updateTime), ascending: ascending)
+
+        let xmlDocument = AEXMLDocument()
+        let rootElement = xmlDocument.addChild(name: Constants.HistoryXml.rootElement)
+
+        for (index, clip) in clips.enumerated() {
+            if maxHistory <= index { break }
+
+            guard !clip.isInvalidated else { continue }
+            guard let data = try? Data(contentsOf: URL(fileURLWithPath: clip.dataPath)),
+                  let unarchiver = try? NSKeyedUnarchiver(forReadingFrom: data) else { continue }
+            unarchiver.requiresSecureCoding = false
+            guard let clipData = unarchiver.decodeObject(forKey: NSKeyedArchiveRootObjectKey) as? CPYClipData else {
+                unarchiver.finishDecoding()
+                continue
+            }
+            unarchiver.finishDecoding()
+            guard !clipData.stringValue.isEmpty else { continue }
+
+            let historyElement = rootElement.addChild(name: Constants.HistoryXml.historyElement)
+            historyElement.addChild(name: Constants.HistoryXml.contentElement, value: clipData.stringValue)
+        }
+
+        return xmlDocument
+    }
+
+    func importClipboard(with xml: AEXMLDocument) {
+        xml[Constants.HistoryXml.rootElement]
+            .children
+            .forEach { historyElement in
+                if let content = historyElement[Constants.HistoryXml.contentElement].value {
+                    let data = CPYClipData(string: content)
+                    save(with: data)
+                }
+            }
     }
 }

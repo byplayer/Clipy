@@ -18,6 +18,9 @@
 
 "History" = "Verlauf";
 
+/* No comment provided by engineer. */
+"Import completed" = "Import abgeschlossen";
+
 "Launch Clipy on system startup?" = "Clipy beim Starten öffnen?";
 
 "Launch on system startup" = "Anwendung automatisch starten";

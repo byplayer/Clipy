@@ -68,8 +68,8 @@ final class CPYClipData: NSObject {
             // Image only data
             return image.resizeImage(CGFloat(width), CGFloat(height))
         } else if let fileName = fileNames.first, let path = fileName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed), let url = URL(string: path) {
-             // In the case of the local file correct data is not included in the image variable
-             // Judge the image from the path and create a thumbnail
+            // In the case of the local file correct data is not included in the image variable
+            // Judge the image from the path and create a thumbnail
             switch url.pathExtension.lowercased() {
             case "jpg", "jpeg", "png", "bmp", "tiff":
                 return NSImage(contentsOfFile: fileName)?.resizeImage(CGFloat(width), CGFloat(height))
@@ -138,6 +138,11 @@ final class CPYClipData: NSObject {
     init(image: NSImage) {
         self.types = [.deprecatedTIFF]
         self.image = image
+    }
+
+    init(string: String) {
+        self.types = [.deprecatedString]
+        self.stringValue = string
     }
 
     deinit {

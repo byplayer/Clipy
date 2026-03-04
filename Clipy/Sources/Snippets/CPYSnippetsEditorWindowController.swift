@@ -15,6 +15,7 @@ import RealmSwift
 import KeyHolder
 import Magnet
 import AEXML
+import UniformTypeIdentifiers
 
 final class CPYSnippetsEditorWindowController: NSWindowController {
 
@@ -71,8 +72,8 @@ final class CPYSnippetsEditorWindowController: NSWindowController {
         // https://github.com/realm/realm-cocoa/issues/1734
         let realm = try! Realm()
         folders = realm.objects(CPYFolder.self)
-                    .sorted(byKeyPath: #keyPath(CPYFolder.index), ascending: true)
-                    .map { $0.deepCopy() }
+            .sorted(byKeyPath: #keyPath(CPYFolder.index), ascending: true)
+            .map { $0.deepCopy() }
         outlineView.reloadData()
         // Select first folder
         if let folder = folders.first {
@@ -159,7 +160,7 @@ extension CPYSnippetsEditorWindowController {
         let panel = NSOpenPanel()
         panel.allowsMultipleSelection = false
         panel.directoryURL = URL(fileURLWithPath: NSHomeDirectory())
-        panel.allowedFileTypes = [Constants.Xml.fileType]
+        panel.allowedContentTypes = [UTType.xml]
         let returnCode = panel.runModal()
 
         if returnCode != NSApplication.ModalResponse.OK { return }
@@ -206,6 +207,11 @@ extension CPYSnippetsEditorWindowController {
                     folders.append(copyFolder)
                 }
             outlineView.reloadData()
+            let alert = NSAlert()
+            alert.messageText = L10n.importCompleted
+            alert.alertStyle = .informational
+            alert.addButton(withTitle: "OK")
+            alert.runModal()
         } catch {
             NSSound.beep()
         }
@@ -235,8 +241,7 @@ extension CPYSnippetsEditorWindowController {
         let panel = NSSavePanel()
         panel.accessoryView = nil
         panel.canSelectHiddenExtension = true
-        panel.allowedFileTypes = [Constants.Xml.fileType]
-        panel.allowsOtherFileTypes = false
+        panel.allowedContentTypes = [UTType.xml]
         panel.directoryURL = URL(fileURLWithPath: NSHomeDirectory())
         panel.nameFieldStringValue = "snippets"
         let returnCode = panel.runModal()
@@ -334,12 +339,12 @@ extension CPYSnippetsEditorWindowController: NSOutlineViewDataSource {
         let pasteboardItem = NSPasteboardItem()
         if let folder = item as? CPYFolder, let index = folders.firstIndex(of: folder) {
             let draggedData = CPYDraggedData(type: .folder, folderIdentifier: folder.identifier, snippetIdentifier: nil, index: index)
-            let data = NSKeyedArchiver.archivedData(withRootObject: draggedData)
+            guard let data = try? NSKeyedArchiver.archivedData(withRootObject: draggedData, requiringSecureCoding: false) else { return nil }
             pasteboardItem.setData(data, forType: NSPasteboard.PasteboardType(rawValue: Constants.Common.draggedDataType))
         } else if let snippet = item as? CPYSnippet, let folder = outlineView.parent(forItem: snippet) as? CPYFolder {
             guard let index = folder.snippets.index(of: snippet) else { return nil }
             let draggedData = CPYDraggedData(type: .snippet, folderIdentifier: folder.identifier, snippetIdentifier: snippet.identifier, index: Int(index))
-            let data = NSKeyedArchiver.archivedData(withRootObject: draggedData)
+            guard let data = try? NSKeyedArchiver.archivedData(withRootObject: draggedData, requiringSecureCoding: false) else { return nil }
             pasteboardItem.setData(data, forType: NSPasteboard.PasteboardType(rawValue: Constants.Common.draggedDataType))
         } else {
             return nil
@@ -350,7 +355,11 @@ extension CPYSnippetsEditorWindowController: NSOutlineViewDataSource {
     func outlineView(_ outlineView: NSOutlineView, validateDrop info: NSDraggingInfo, proposedItem item: Any?, proposedChildIndex index: Int) -> NSDragOperation {
         let pasteboard = info.draggingPasteboard
         guard let data = pasteboard.data(forType: NSPasteboard.PasteboardType(rawValue: Constants.Common.draggedDataType)) else { return NSDragOperation() }
-        guard let draggedData = NSKeyedUnarchiver.unarchiveObject(with: data) as? CPYDraggedData else { return NSDragOperation() }
+        guard let unarchiver = try? NSKeyedUnarchiver(forReadingFrom: data) else { return NSDragOperation() }
+        unarchiver.requiresSecureCoding = false
+        let draggedData = unarchiver.decodeObject(forKey: NSKeyedArchiveRootObjectKey) as? CPYDraggedData
+        unarchiver.finishDecoding()
+        guard let draggedData = draggedData else { return NSDragOperation() }
 
         switch draggedData.type {
         case .folder where item == nil:
@@ -365,7 +374,11 @@ extension CPYSnippetsEditorWindowController: NSOutlineViewDataSource {
     func outlineView(_ outlineView: NSOutlineView, acceptDrop info: NSDraggingInfo, item: Any?, childIndex index: Int) -> Bool {
         let pasteboard = info.draggingPasteboard
         guard let data = pasteboard.data(forType: NSPasteboard.PasteboardType(rawValue: Constants.Common.draggedDataType)) else { return false }
-        guard let draggedData = NSKeyedUnarchiver.unarchiveObject(with: data) as? CPYDraggedData else { return false }
+        guard let unarchiver = try? NSKeyedUnarchiver(forReadingFrom: data) else { return false }
+        unarchiver.requiresSecureCoding = false
+        let draggedData = unarchiver.decodeObject(forKey: NSKeyedArchiveRootObjectKey) as? CPYDraggedData
+        unarchiver.finishDecoding()
+        guard let draggedData = draggedData else { return false }
 
         switch draggedData.type {
         case .folder where index != draggedData.index:
