@@ -98,17 +98,17 @@ private extension MenuManager {
     func bind() {
         // Realm Notification
         clipToken = realm.objects(CPYClip.self)
-                        .observe { [weak self] _ in
-                            DispatchQueue.main.async { [weak self] in
-                                self?.createClipMenu()
-                            }
-                        }
+            .observe { [weak self] _ in
+                DispatchQueue.main.async { [weak self] in
+                    self?.createClipMenu()
+                }
+            }
         snippetToken = realm.objects(CPYFolder.self)
-                        .observe { [weak self] _ in
-                            DispatchQueue.main.async { [weak self] in
-                                self?.createClipMenu()
-                            }
-                        }
+            .observe { [weak self] _ in
+                DispatchQueue.main.async { [weak self] in
+                    self?.createClipMenu()
+                }
+            }
         // Menu icon
         AppEnvironment.current.defaults.rx.observe(Int.self, Constants.UserDefaults.showStatusItem, retainSelf: false)
             .compactMap { $0 }
@@ -174,7 +174,7 @@ private extension MenuManager {
 
 // MARK: - Menus
 private extension MenuManager {
-     func createClipMenu() {
+    func createClipMenu() {
         clipMenu = NSMenu(title: Constants.Application.name)
         historyMenu = NSMenu(title: Constants.Menu.history)
         snippetMenu = NSMenu(title: Constants.Menu.snippet)

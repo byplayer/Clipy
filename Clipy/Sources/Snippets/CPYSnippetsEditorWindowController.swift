@@ -72,8 +72,8 @@ final class CPYSnippetsEditorWindowController: NSWindowController {
         // https://github.com/realm/realm-cocoa/issues/1734
         let realm = try! Realm()
         folders = realm.objects(CPYFolder.self)
-                    .sorted(byKeyPath: #keyPath(CPYFolder.index), ascending: true)
-                    .map { $0.deepCopy() }
+            .sorted(byKeyPath: #keyPath(CPYFolder.index), ascending: true)
+            .map { $0.deepCopy() }
         outlineView.reloadData()
         // Select first folder
         if let folder = folders.first {

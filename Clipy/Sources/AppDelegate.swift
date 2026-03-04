@@ -204,7 +204,7 @@ extension AppDelegate: NSApplicationDelegate {
 
     func applicationWillFinishLaunching(_ notification: Notification) {
         #if RELEASE
-            PFMoveToApplicationsFolderIfNecessary()
+        PFMoveToApplicationsFolderIfNecessary()
         #endif
     }
 
