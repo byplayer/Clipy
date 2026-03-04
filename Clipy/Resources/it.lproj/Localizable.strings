@@ -18,6 +18,9 @@
 
 "History" = "Cronologia";
 
+/* No comment provided by engineer. */
+"Import completed" = "Importazione completata";
+
 "Launch Clipy on system startup?" = "Vuoi avviare Clipy al login?";
 
 "Launch on system startup" = "Avvia Clipy al login";

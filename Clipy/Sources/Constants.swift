@@ -101,6 +101,13 @@ struct Constants {
         static let contentElement = "content"
     }
 
+    struct HistoryXml {
+        static let fileType = "xml"
+        static let rootElement = "histories"
+        static let historyElement = "history"
+        static let contentElement = "content"
+    }
+
     struct HotKey {
         static let mainKeyCombo = "kCPYHotKeyMainKeyCombo"
         static let historyKeyCombo = "kCPYHotKeyHistoryKeyCombo"

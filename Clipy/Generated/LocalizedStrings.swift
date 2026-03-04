@@ -30,6 +30,8 @@ internal enum L10n {
   internal static let general = L10n.tr("Localizable", "General", fallback: "General")
   /// History
   internal static let history = L10n.tr("Localizable", "History", fallback: "History")
+  /// No comment provided by engineer.
+  internal static let importCompleted = L10n.tr("Localizable", "Import completed", fallback: "Import completed")
   /// Launch Clipy on system startup?
   internal static let launchClipyOnSystemStartup = L10n.tr("Localizable", "Launch Clipy on system startup?", fallback: "Launch Clipy on system startup?")
   /// Launch on system startup

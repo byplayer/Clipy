@@ -207,6 +207,11 @@ extension CPYSnippetsEditorWindowController {
                     folders.append(copyFolder)
                 }
             outlineView.reloadData()
+            let alert = NSAlert()
+            alert.messageText = L10n.importCompleted
+            alert.alertStyle = .informational
+            alert.addButton(withTitle: "OK")
+            alert.runModal()
         } catch {
             NSSound.beep()
         }

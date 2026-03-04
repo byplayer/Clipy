@@ -18,6 +18,9 @@
 
 "History" = "履歴";
 
+/* No comment provided by engineer. */
+"Import completed" = "読み込みが完了しました";
+
 "Launch Clipy on system startup?" = "システム起動時にClipyを起動しますか?";
 
 "Launch on system startup" = "起動する";

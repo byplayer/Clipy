@@ -18,6 +18,9 @@
 
 "History" = "历史";
 
+/* No comment provided by engineer. */
+"Import completed" = "导入完成";
+
 "Launch Clipy on system startup?" = "系统启动时打开 Clipy?";
 
 "Launch on system startup" = "系统启动时打开";
