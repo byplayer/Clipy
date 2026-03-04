@@ -2,27 +2,15 @@ name: Danger
 
 on: pull_request
 
-env:
-  DEVELOPER_DIR: /Applications/Xcode_16.0.app/Contents/Developer
-
 jobs:
-  danger:
+  swiftlint:
     runs-on: macos-14
     steps:
     - uses: actions/checkout@v4
       with:
-        fetch-depth: 1
+        fetch-depth: 0
 
-    - name: Setup ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: '3.2'
-        bundler-cache: true
-
-    - name: Install build tools
-      run: brew install swiftlint
-
-    - name: Run Danger
-      run: bundle exec danger
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: SwiftLint
+      run: |
+        brew install swiftlint
+        swiftlint lint --reporter github-actions-logging

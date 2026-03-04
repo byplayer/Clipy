@@ -11,14 +11,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Setup ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: '3.2'
-        bundler-cache: true
-
     - name: Install build tools
       run: brew install swiftlint swiftgen bartycrouch
 
-    - name: Run fastlane
-      run: bundle exec fastlane test
+    - name: Run tests
+      run: xcodebuild test -project Clipy.xcodeproj -scheme Clipy -verbose -clean
