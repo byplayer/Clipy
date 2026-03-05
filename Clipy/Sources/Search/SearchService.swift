@@ -94,11 +94,12 @@ final class SearchService {
 
                 guard let score = bestScore else { continue }
 
+                let singleLine = snippet.content.components(separatedBy: .newlines).joined(separator: " ")
                 let contentPreview: String
-                if snippet.content.count > 50 {
-                    contentPreview = String(snippet.content.prefix(50)) + "..."
+                if singleLine.count > 50 {
+                    contentPreview = String(singleLine.prefix(50)) + "..."
                 } else {
-                    contentPreview = snippet.content
+                    contentPreview = singleLine
                 }
 
                 let item = SearchResultItem(
@@ -128,6 +129,7 @@ final class SearchService {
         } else if primaryPboardType == .deprecatedFilenames && clip.title.isEmpty {
             return "(Filenames)"
         }
-        return clip.title.isEmpty ? "(Empty)" : clip.title
+        let title = clip.title.isEmpty ? "(Empty)" : clip.title
+        return title.components(separatedBy: .newlines).joined(separator: " ")
     }
 }

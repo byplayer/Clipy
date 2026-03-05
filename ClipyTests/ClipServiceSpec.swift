@@ -11,6 +11,8 @@ class ClipServiceSpec: QuickSpec {
 
         beforeEach {
             Realm.Configuration.defaultConfiguration.inMemoryIdentifier = NSUUID().uuidString
+            UserDefaults.standard.set(false, forKey: Constants.UserDefaults.reorderClipsAfterPasting)
+            UserDefaults.standard.set(30, forKey: Constants.UserDefaults.maxHistorySize)
         }
 
         describe("Export") {

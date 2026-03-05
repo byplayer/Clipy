@@ -213,6 +213,22 @@ extension SearchServiceSpec {
                 expect(results.first?.subtitle).to(equal(""))
             }
 
+            it("replaces newlines with spaces in clip title") {
+                self.createClip(with: "line one\nline two\nline three", index: 0)
+
+                let service = SearchService()
+                let results = service.search(query: "line")
+                expect(results.first?.title).to(equal("line one line two line three"))
+            }
+
+            it("replaces newlines with spaces in snippet content preview") {
+                self.createSnippet(title: "multiline snippet", content: "first\nsecond\nthird")
+
+                let service = SearchService()
+                let results = service.search(query: "multiline")
+                expect(results.first?.subtitle).to(equal("first second third"))
+            }
+
             it("snippet content at exactly 50 chars is not truncated") {
                 let exact50 = String(repeating: "b", count: 50)
                 self.createSnippet(title: "exact snippet", content: exact50)
