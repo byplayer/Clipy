@@ -10,6 +10,7 @@
 
 import Cocoa
 import AEXML
+import UniformTypeIdentifiers
 
 final class CPYGeneralPreferenceViewController: NSViewController {
 
@@ -18,7 +19,7 @@ final class CPYGeneralPreferenceViewController: NSViewController {
         let exportXml = AppEnvironment.current.clipService.exportClipboard()
 
         let panel = NSSavePanel()
-        panel.allowedFileTypes = [Constants.HistoryXml.fileType]
+        panel.allowedContentTypes = [UTType(filenameExtension: Constants.HistoryXml.fileType) ?? .xml]
         panel.allowsOtherFileTypes = false
         panel.directoryURL = URL(fileURLWithPath: NSHomeDirectory())
         panel.nameFieldStringValue = "clipy_history"
@@ -40,7 +41,7 @@ final class CPYGeneralPreferenceViewController: NSViewController {
         let panel = NSOpenPanel()
         panel.allowsMultipleSelection = false
         panel.directoryURL = URL(fileURLWithPath: NSHomeDirectory())
-        panel.allowedFileTypes = [Constants.HistoryXml.fileType]
+        panel.allowedContentTypes = [UTType(filenameExtension: Constants.HistoryXml.fileType) ?? .xml]
         let returnCode = panel.runModal()
 
         if returnCode != .OK { return }

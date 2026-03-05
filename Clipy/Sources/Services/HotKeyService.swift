@@ -31,6 +31,7 @@ final class HotKeyService: NSObject {
     fileprivate(set) var historyKeyCombo: KeyCombo?
     fileprivate(set) var snippetKeyCombo: KeyCombo?
     fileprivate(set) var clearHistoryKeyCombo: KeyCombo?
+    fileprivate(set) var searchKeyCombo: KeyCombo?
 
 }
 
@@ -51,6 +52,10 @@ extension HotKeyService {
     @objc func popUpClearHistoryAlert() {
         guard let appDelegate = NSApp.delegate as? AppDelegate else { return }
         appDelegate.clearAllHistory()
+    }
+
+    @objc func showSearchWindow() {
+        CPYSearchWindowController.shared.showSearchWindow()
     }
 }
 
@@ -74,6 +79,8 @@ extension HotKeyService {
         change(with: .snippet, keyCombo: savedKeyCombo(forKey: Constants.HotKey.snippetKeyCombo))
         // Clear History
         changeClearHistoryKeyCombo(savedKeyCombo(forKey: Constants.HotKey.clearHistoryKeyCombo))
+        // Search
+        changeSearchKeyCombo(savedKeyCombo(forKey: Constants.HotKey.searchKeyCombo))
     }
 
     func change(with type: MenuType, keyCombo: KeyCombo?) {
@@ -97,6 +104,18 @@ extension HotKeyService {
         // Register new hotkey
         guard let keyCombo = keyCombo else { return }
         let hotkey = HotKey(identifier: "ClearHistory", keyCombo: keyCombo, target: self, action: #selector(HotKeyService.popUpClearHistoryAlert))
+        hotkey.register()
+    }
+
+    func changeSearchKeyCombo(_ keyCombo: KeyCombo?) {
+        searchKeyCombo = keyCombo
+        AppEnvironment.current.defaults.set(keyCombo?.archive(), forKey: Constants.HotKey.searchKeyCombo)
+        AppEnvironment.current.defaults.synchronize()
+        // Reset hotkey
+        HotKeyCenter.shared.unregisterHotKey(with: "Search")
+        // Register new hotkey
+        guard let keyCombo = keyCombo else { return }
+        let hotkey = HotKey(identifier: "Search", keyCombo: keyCombo, target: self, action: #selector(HotKeyService.showSearchWindow))
         hotkey.register()
     }
 

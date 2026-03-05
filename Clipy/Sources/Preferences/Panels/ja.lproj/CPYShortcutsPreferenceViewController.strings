@@ -15,3 +15,9 @@
 
 /* Class = "NSTextFieldCell"; title = "Clear History:"; ObjectID = "f3b-Ht-X5w"; */
 "f3b-Ht-X5w.title" = "履歴をクリア:";
+
+/* Class = "NSTextFieldCell"; title = "Search"; ObjectID = "sLc-Ux-P4r"; */
+"sLc-Ux-P4r.title" = "検索";
+
+/* Class = "NSTextFieldCell"; title = "Search:"; ObjectID = "sLe-Wx-X7v"; */
+"sLe-Wx-X7v.title" = "検索:";
