@@ -15,7 +15,7 @@ import RealmSwift
 final class SearchService {
 
     // MARK: - Properties
-    private let maxResults = 20
+    private let maxResults = 100
 
     // MARK: - Search
     func search(query: String) -> [SearchResultItem] {
@@ -41,6 +41,7 @@ final class SearchService {
                 primaryKey: clip.dataHash,
                 title: title,
                 subtitle: "",
+                fullContent: clipFullContent(for: clip),
                 score: 0,
                 matchedIndices: []
             )
@@ -64,6 +65,7 @@ final class SearchService {
                     primaryKey: clip.dataHash,
                     title: title,
                     subtitle: "",
+                    fullContent: clipFullContent(for: clip),
                     score: matchResult.score,
                     matchedIndices: matchResult.matchedIndices
                 )
@@ -107,6 +109,7 @@ final class SearchService {
                     primaryKey: snippet.identifier,
                     title: snippet.title,
                     subtitle: contentPreview,
+                    fullContent: snippet.content,
                     score: score,
                     matchedIndices: bestIndices
                 )
@@ -120,6 +123,18 @@ final class SearchService {
     }
 
     // MARK: - Helpers
+    private func clipFullContent(for clip: CPYClip) -> String {
+        let primaryPboardType = NSPasteboard.PasteboardType(rawValue: clip.primaryType)
+        if primaryPboardType == .deprecatedTIFF {
+            return "(Image)"
+        } else if primaryPboardType == .deprecatedPDF {
+            return "(PDF)"
+        } else if primaryPboardType == .deprecatedFilenames && clip.title.isEmpty {
+            return "(Filenames)"
+        }
+        return clip.title.isEmpty ? "(Empty)" : clip.title
+    }
+
     private func clipTitle(for clip: CPYClip) -> String {
         let primaryPboardType = NSPasteboard.PasteboardType(rawValue: clip.primaryType)
         if primaryPboardType == .deprecatedTIFF {

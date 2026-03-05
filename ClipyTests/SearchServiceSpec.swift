@@ -15,6 +15,7 @@ class SearchServiceSpec: QuickSpec {
         describeSearchWithQuery()
         describeSearchResultTypes()
         describeTextTruncation()
+        describeFullContent()
 
         afterEach {
             let realm = try! Realm()
@@ -44,14 +45,14 @@ extension SearchServiceSpec {
                 expect(results.last?.title).to(equal("oldest clip"))
             }
 
-            it("returns at most 20 clips") {
-                for idx in 0..<25 {
+            it("returns at most 100 clips") {
+                for idx in 0..<105 {
                     self.createClip(with: "clip \(idx)", index: idx)
                 }
 
                 let service = SearchService()
                 let results = service.search(query: "")
-                expect(results.count).to(equal(20))
+                expect(results.count).to(equal(100))
             }
         }
     }
@@ -100,14 +101,14 @@ extension SearchServiceSpec {
                 expect(results.first?.title).to(equal("abc"))
             }
 
-            it("limits results to 20") {
-                for idx in 0..<25 {
+            it("limits results to 100") {
+                for idx in 0..<105 {
                     self.createClip(with: "match \(idx)", index: idx)
                 }
 
                 let service = SearchService()
                 let results = service.search(query: "match")
-                expect(results.count).to(equal(20))
+                expect(results.count).to(equal(100))
             }
 
             it("excludes disabled snippets") {
@@ -237,6 +238,66 @@ extension SearchServiceSpec {
                 let results = service.search(query: "exact")
                 expect(results.first?.subtitle).to(equal(exact50))
                 expect(results.first?.subtitle.count).to(equal(50))
+            }
+        }
+    }
+}
+
+// MARK: - Full Content
+extension SearchServiceSpec {
+    func describeFullContent() {
+        describe("fullContent") {
+            it("preserves newlines in clip fullContent") {
+                self.createClip(with: "line one\nline two\nline three", index: 0)
+
+                let service = SearchService()
+                let results = service.search(query: "line")
+                expect(results.first?.title).to(equal("line one line two line three"))
+                expect(results.first?.fullContent).to(equal("line one\nline two\nline three"))
+            }
+
+            it("preserves newlines in clip fullContent for empty query") {
+                self.createClip(with: "first\nsecond", index: 0)
+
+                let service = SearchService()
+                let results = service.search(query: "")
+                expect(results.first?.fullContent).to(equal("first\nsecond"))
+            }
+
+            it("returns full snippet content without truncation") {
+                let longContent = String(repeating: "a", count: 80)
+                self.createSnippet(title: "long snippet", content: longContent)
+
+                let service = SearchService()
+                let results = service.search(query: "long")
+                expect(results.first?.subtitle.count).to(equal(53))
+                expect(results.first?.fullContent).to(equal(longContent))
+                expect(results.first?.fullContent.count).to(equal(80))
+            }
+
+            it("preserves newlines in snippet fullContent") {
+                self.createSnippet(title: "multiline", content: "line1\nline2\nline3")
+
+                let service = SearchService()
+                let results = service.search(query: "multiline")
+                expect(results.first?.subtitle).to(equal("line1 line2 line3"))
+                expect(results.first?.fullContent).to(equal("line1\nline2\nline3"))
+            }
+
+            it("returns short clip content as-is in fullContent") {
+                self.createClip(with: "short", index: 0)
+
+                let service = SearchService()
+                let results = service.search(query: "short")
+                expect(results.first?.fullContent).to(equal("short"))
+            }
+
+            it("returns (Empty) for empty clip fullContent") {
+                self.createClip(with: "", index: 0)
+
+                let service = SearchService()
+                let results = service.search(query: "")
+                expect(results.first?.fullContent).to(equal("(Empty)"))
             }
         }
     }
