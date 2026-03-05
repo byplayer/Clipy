@@ -99,6 +99,12 @@
 		FAC43E2B1B35DFDF00C06102 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FAC43E2A1B35DFDF00C06102 /* WebKit.framework */; };
 		FAE911B91DE045E2008A4BEC /* HotKeyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAE911B81DE045E2008A4BEC /* HotKeyService.swift */; };
 		FAE911BB1DE054F1008A4BEC /* NSCoding+Archive.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAE911BA1DE054F1008A4BEC /* NSCoding+Archive.swift */; };
+		BB0002010000000000000001 /* FuzzyMatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0001010000000000000001 /* FuzzyMatch.swift */; };
+		BB0002010000000000000002 /* SearchResultItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0001010000000000000002 /* SearchResultItem.swift */; };
+		BB0002010000000000000003 /* SearchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0001010000000000000003 /* SearchService.swift */; };
+		BB0002010000000000000004 /* CPYSearchWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0001010000000000000004 /* CPYSearchWindowController.swift */; };
+		BB0002010000000000000005 /* FuzzyMatchSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0001010000000000000005 /* FuzzyMatchSpec.swift */; };
+		BB0002010000000000000006 /* SearchServiceSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0001010000000000000006 /* SearchServiceSpec.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -242,6 +248,12 @@
 		FAC43E2A1B35DFDF00C06102 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		FAE911B81DE045E2008A4BEC /* HotKeyService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HotKeyService.swift; sourceTree = "<group>"; };
 		FAE911BA1DE054F1008A4BEC /* NSCoding+Archive.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSCoding+Archive.swift"; sourceTree = "<group>"; };
+		BB0001010000000000000001 /* FuzzyMatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuzzyMatch.swift; sourceTree = "<group>"; };
+		BB0001010000000000000002 /* SearchResultItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultItem.swift; sourceTree = "<group>"; };
+		BB0001010000000000000003 /* SearchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchService.swift; sourceTree = "<group>"; };
+		BB0001010000000000000004 /* CPYSearchWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CPYSearchWindowController.swift; sourceTree = "<group>"; };
+		BB0001010000000000000005 /* FuzzyMatchSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuzzyMatchSpec.swift; sourceTree = "<group>"; };
+		BB0001010000000000000006 /* SearchServiceSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchServiceSpec.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -344,6 +356,7 @@
 			children = (
 				FA3778911F3B690D003B5BAB /* Environments */,
 				FA0D5CE61DDCC5D000AC9052 /* Services */,
+				BB0003010000000000000001 /* Search */,
 				FA1DB4EC1DDCB4C0007F95C8 /* Preferences */,
 				FA1DB50C1DDCB4C0007F95C8 /* Snippets */,
 				FA1DB4A41DDCB443007F95C8 /* Enums */,
@@ -554,6 +567,8 @@
 				FA6167931D3ACCB90049FA14 /* DraggedDataSpec.swift */,
 				FA6167911D3ABEB10049FA14 /* FolderSpec.swift */,
 				FA6167951D3ACDD80049FA14 /* SnippetSpec.swift */,
+				BB0001010000000000000005 /* FuzzyMatchSpec.swift */,
+				BB0001010000000000000006 /* SearchServiceSpec.swift */,
 				FAC43DDC1B35D8B100C06102 /* Supporting Files */,
 			);
 			path = ClipyTests;
@@ -565,6 +580,17 @@
 				FAC43DDD1B35D8B100C06102 /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		BB0003010000000000000001 /* Search */ = {
+			isa = PBXGroup;
+			children = (
+				BB0001010000000000000001 /* FuzzyMatch.swift */,
+				BB0001010000000000000002 /* SearchResultItem.swift */,
+				BB0001010000000000000003 /* SearchService.swift */,
+				BB0001010000000000000004 /* CPYSearchWindowController.swift */,
+			);
+			path = Search;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -829,6 +855,10 @@
 				FA1DB5121DDCB4C0007F95C8 /* CPYPreferencesWindowController.swift in Sources */,
 				FAE911BB1DE054F1008A4BEC /* NSCoding+Archive.swift in Sources */,
 				FA3778951F3B6920003B5BAB /* Environment.swift in Sources */,
+				BB0002010000000000000001 /* FuzzyMatch.swift in Sources */,
+				BB0002010000000000000002 /* SearchResultItem.swift in Sources */,
+				BB0002010000000000000003 /* SearchService.swift in Sources */,
+				BB0002010000000000000004 /* CPYSearchWindowController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -841,6 +871,8 @@
 				FA08EDF81D1FED7D000D1D13 /* HotKeyServiceSpec.swift in Sources */,
 				FA6167961D3ACDD80049FA14 /* SnippetSpec.swift in Sources */,
 				FA6167941D3ACCB90049FA14 /* DraggedDataSpec.swift in Sources */,
+				BB0002010000000000000005 /* FuzzyMatchSpec.swift in Sources */,
+				BB0002010000000000000006 /* SearchServiceSpec.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

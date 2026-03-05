@@ -100,6 +100,7 @@ class HotKeyServiceSpec: QuickSpec {
                 defaults.removeObject(forKey: Constants.HotKey.mainKeyCombo)
                 defaults.removeObject(forKey: Constants.HotKey.historyKeyCombo)
                 defaults.removeObject(forKey: Constants.HotKey.snippetKeyCombo)
+                defaults.removeObject(forKey: Constants.HotKey.searchKeyCombo)
                 defaults.synchronize()
             }
         }
@@ -211,6 +212,7 @@ class HotKeyServiceSpec: QuickSpec {
                 defaults.removeObject(forKey: Constants.HotKey.mainKeyCombo)
                 defaults.removeObject(forKey: Constants.HotKey.historyKeyCombo)
                 defaults.removeObject(forKey: Constants.HotKey.snippetKeyCombo)
+                defaults.removeObject(forKey: Constants.HotKey.searchKeyCombo)
                 defaults.synchronize()
             }
         }

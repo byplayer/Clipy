@@ -15,3 +15,9 @@
 
 /* Class = "NSTextFieldCell"; title = "Snippets:"; ObjectID = "fXr-ry-5ds"; */
 "fXr-ry-5ds.title" = "片断：";
+
+/* Class = "NSTextFieldCell"; title = "Search"; ObjectID = "sLc-Ux-P4r"; */
+"sLc-Ux-P4r.title" = "搜索";
+
+/* Class = "NSTextFieldCell"; title = "Search:"; ObjectID = "sLe-Wx-X7v"; */
+"sLe-Wx-X7v.title" = "搜索：";

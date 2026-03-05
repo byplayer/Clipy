@@ -47,15 +47,13 @@ else
 fi
 
 # --- Build (Release) ---
-# Note: xcodebuild may report test target build failures in Release mode,
-# but the app target builds successfully. We verify the app exists after build.
 if command -v xcpretty &> /dev/null; then
     xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Release \
-        -derivedDataPath "$BUILD_DIR" build | xcpretty || true
+        -derivedDataPath "$BUILD_DIR" build | xcpretty
 else
     echo "xcpretty could not be found. Proceeding without xcpretty."
     xcodebuild -project "$PROJECT" -scheme "$SCHEME" -configuration Release \
-        -derivedDataPath "$BUILD_DIR" build || true
+        -derivedDataPath "$BUILD_DIR" build
 fi
 
 # --- Verify build ---
@@ -64,6 +62,8 @@ if [ ! -d "$APP_SRC" ]; then
     echo "Error: Build failed. ${APP_SRC} not found."
     exit 1
 fi
+
+set -ue
 
 if [ "$DRY_RUN" = true ]; then
     echo "DRY RUN: Would execute the following commands:"
