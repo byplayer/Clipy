@@ -73,6 +73,44 @@ final class CPYSearchWindowController: NSObject {
         return table
     }()
 
+    private lazy var previewPanel: NSPanel = {
+        let panel = NSPanel(
+            contentRect: NSRect(x: 0, y: 0, width: 400, height: 400),
+            styleMask: [.titled, .fullSizeContentView, .nonactivatingPanel],
+            backing: .buffered,
+            defer: false
+        )
+        panel.level = .floating
+        panel.collectionBehavior = .canJoinAllSpaces
+        panel.titleVisibility = .hidden
+        panel.titlebarAppearsTransparent = true
+        panel.isMovableByWindowBackground = false
+        panel.backgroundColor = NSColor.windowBackgroundColor
+        return panel
+    }()
+
+    private lazy var previewTextView: NSTextView = {
+        let textView = NSTextView()
+        textView.isEditable = false
+        textView.isSelectable = true
+        textView.font = NSFont.monospacedSystemFont(ofSize: 12, weight: .regular)
+        textView.backgroundColor = .clear
+        textView.textContainerInset = NSSize(width: 8, height: 8)
+        textView.isVerticallyResizable = true
+        textView.isHorizontallyResizable = false
+        textView.textContainer?.widthTracksTextView = true
+        return textView
+    }()
+
+    private lazy var previewScrollView: NSScrollView = {
+        let scroll = NSScrollView()
+        scroll.hasVerticalScroller = true
+        scroll.translatesAutoresizingMaskIntoConstraints = false
+        scroll.borderType = .noBorder
+        scroll.documentView = previewTextView
+        return scroll
+    }()
+
     private var isSetUp = false
 
     // MARK: - Init
@@ -85,6 +123,7 @@ final class CPYSearchWindowController: NSObject {
         guard !isSetUp else { return }
         isSetUp = true
         setupUI()
+        setupPreviewPanel()
         setupNotifications()
     }
 
@@ -120,6 +159,20 @@ final class CPYSearchWindowController: NSObject {
         ])
     }
 
+    private func setupPreviewPanel() {
+        let contentView = NSView()
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        previewPanel.contentView = contentView
+        contentView.addSubview(previewScrollView)
+
+        NSLayoutConstraint.activate([
+            previewScrollView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            previewScrollView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            previewScrollView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            previewScrollView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+        ])
+    }
+
     private func setupNotifications() {
         NotificationCenter.default.addObserver(
             self,
@@ -150,6 +203,7 @@ final class CPYSearchWindowController: NSObject {
     }
 
     private func closeSearchWindow() {
+        previewPanel.orderOut(nil)
         panel.orderOut(nil)
         previousApp = nil
     }
@@ -167,6 +221,7 @@ final class CPYSearchWindowController: NSObject {
             tableView.selectRowIndexes(IndexSet(integer: 0), byExtendingSelection: false)
             tableView.scrollRowToVisible(0)
         }
+        updatePreview()
     }
 
     private func debouncedSearch(query: String) {
@@ -213,6 +268,51 @@ final class CPYSearchWindowController: NSObject {
                 pasteService.paste()
             }
         }
+    }
+
+    // MARK: - Preview
+    private func needsPreview(_ item: SearchResultItem) -> Bool {
+        let content = item.fullContent
+        if content == "(Image)" || content == "(PDF)" || content == "(Filenames)" || content == "(Empty)" {
+            return false
+        }
+        if content.contains("\n") || content.contains("\r") {
+            return true
+        }
+        // Check if content is long enough to be truncated in the table
+        if content.count > 80 {
+            return true
+        }
+        return false
+    }
+
+    private func updatePreview() {
+        let row = tableView.selectedRow
+        guard row >= 0 && row < results.count else {
+            previewPanel.orderOut(nil)
+            return
+        }
+
+        let item = results[row]
+        guard needsPreview(item) else {
+            previewPanel.orderOut(nil)
+            return
+        }
+
+        previewTextView.string = item.fullContent
+
+        // Position preview panel to the right of main panel
+        let mainFrame = panel.frame
+        let previewX = mainFrame.maxX + 4
+        let previewFrame = NSRect(x: previewX, y: mainFrame.origin.y, width: 400, height: mainFrame.height)
+        previewPanel.setFrame(previewFrame, display: true)
+
+        if !previewPanel.isVisible {
+            previewPanel.orderFront(nil)
+        }
+
+        // Scroll to top
+        previewTextView.scrollToBeginningOfDocument(nil)
     }
 
     // MARK: - Actions
@@ -294,6 +394,10 @@ extension CPYSearchWindowController: NSTableViewDelegate {
         }
 
         return cell
+    }
+
+    func tableViewSelectionDidChange(_ notification: Notification) {
+        updatePreview()
     }
 
     func tableView(_ tableView: NSTableView, heightOfRow row: Int) -> CGFloat {

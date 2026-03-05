@@ -20,6 +20,7 @@ struct SearchResultItem {
     let primaryKey: String
     let title: String
     let subtitle: String
+    let fullContent: String
     let score: Int
     let matchedIndices: [Int]
 }
