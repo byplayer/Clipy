@@ -1,0 +1,35 @@
+# Changelog
+
+## [2.0.0] - 2026-03-09
+
+### Features
+
+- Add fuzzy search window for clips and snippets
+- Add preview panel in search window and increase max results to 100
+- Add clipboard history export/import with import completion alert
+
+### Improvements
+
+- Migrate CocoaPods to Swift Package Manager
+- Raise macOS deployment target to 11.0
+- Update runner to macOS 15 and use default Xcode
+- Fix deprecated APIs and resolve build warnings
+- Remove Ruby toolchain (Fastlane, Danger, Bundler)
+- Remove Fabric/Crashlytics that has ended service
+- Update dependency libraries for M1 native build
+- Update dependency libraries for Reactive Extensions and global hotkeys
+- Build with Swift 5.2 / Xcode 12.2
+- Fix spacing between "Export clipboard history" section and status bar icon in General preferences
+
+### Bug Fixes
+
+- Fix CI test failure and newline handling in search results
+- Fix status bar item to use variableLength
+- Embed RealmSwift framework and fix install script
+- Resolve Xcode build phase issues for SPM migration
+- Fix xcodebuild command syntax in CI
+- Fix an issue where whitespace was removed when importing snippets
+
+## [1.2.1] - 2018-10-15
+
+- Update LoginServiceKit.framework
