@@ -76,6 +76,5 @@ else
     pkill "$APP_NAME" || true
     rm -rf "/Applications/${APP_NAME}.app"
     cp -r "$APP_SRC" /Applications/
-    codesign --force --deep --sign - "/Applications/${APP_NAME}.app"
     open "/Applications/${APP_NAME}.app"
 fi

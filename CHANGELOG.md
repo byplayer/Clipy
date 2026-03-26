@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.0.1] - 2026-03-26
+
+### Bug Fixes
+
+- Fix incremental search paste not reordering clipboard history to match history menu behavior
+- Remove ad-hoc re-signing in install script to preserve macOS accessibility permission across reinstalls
+- Upgrade realm-swift from v10 to v20 to fix build failure with Xcode 26.4
+
 ## [2.0.0] - 2026-03-09
 
 ### Features
