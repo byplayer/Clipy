@@ -1291,7 +1291,7 @@
 			repositoryURL = "https://github.com/realm/realm-swift.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 10.7.2;
+				minimumVersion = 20.0.0;
 			};
 		};
 		AA000002000000000000003C /* XCRemoteSwiftPackageReference "PINCache" */ = {
