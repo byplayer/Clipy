@@ -257,6 +257,11 @@ final class CPYSearchWindowController: NSObject {
                     NSSound.beep()
                     return
                 }
+                if AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.reorderClipsAfterPasting) {
+                    realm.transaction {
+                        clip.updateTime = Int(Date().timeIntervalSince1970)
+                    }
+                }
                 pasteService.paste(with: clip)
             case .snippet:
                 let realm = try! Realm()

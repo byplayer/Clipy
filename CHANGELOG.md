@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.0.1] - 2026-03-26
+
+### Bug Fixes
+
+- Fix incremental search paste not reordering clipboard history to match history menu behavior
+
 ## [2.0.0] - 2026-03-09
 
 ### Features
