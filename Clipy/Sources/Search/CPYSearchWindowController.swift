@@ -64,6 +64,7 @@ final class CPYSearchWindowController: NSObject {
         table.delegate = self
         table.dataSource = self
         table.target = self
+        table.action = #selector(tableViewSingleClicked)
         table.doubleAction = #selector(tableViewDoubleClicked)
 
         let column = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("ResultColumn"))
@@ -321,6 +322,10 @@ final class CPYSearchWindowController: NSObject {
     }
 
     // MARK: - Actions
+    @objc private func tableViewSingleClicked() {
+        selectCurrentItem()
+    }
+
     @objc private func tableViewDoubleClicked() {
         selectCurrentItem()
     }
