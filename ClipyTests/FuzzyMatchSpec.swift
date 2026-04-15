@@ -69,6 +69,41 @@ class FuzzyMatchSpec: QuickSpec {
                 expect(result).toNot(beNil())
                 expect(result!.matchedIndices).to(equal([0, 1]))
             }
+
+            context("multi-word query (space-separated)") {
+                it("matches when all words are found in URL") {
+                    let result = fuzzyMatch(query: "example dd", target: "https://example.com/abc/zzzz-ddee")
+                    expect(result).toNot(beNil())
+                }
+
+                it("matches when all words are found in URL with different word order") {
+                    let result = fuzzyMatch(query: "example zz", target: "https://example.com/abc/zzzz-ddee")
+                    expect(result).toNot(beNil())
+                }
+
+                it("returns nil when one word does not match") {
+                    let result = fuzzyMatch(query: "example xyz", target: "https://example.com/abc/zzzz-ddee")
+                    expect(result).to(beNil())
+                }
+
+                it("matches single word query as before") {
+                    let result = fuzzyMatch(query: "example", target: "https://example.com/abc/zzzz-ddee")
+                    expect(result).toNot(beNil())
+                }
+
+                it("combines scores from all matched words") {
+                    let singleWord = fuzzyMatch(query: "example", target: "https://example.com/abc/zzzz-ddee")
+                    let multiWord = fuzzyMatch(query: "example dd", target: "https://example.com/abc/zzzz-ddee")
+                    expect(singleWord).toNot(beNil())
+                    expect(multiWord).toNot(beNil())
+                    expect(multiWord!.score).to(beGreaterThan(singleWord!.score))
+                }
+
+                it("ignores extra spaces between words") {
+                    let result = fuzzyMatch(query: "example   dd", target: "https://example.com/abc/zzzz-ddee")
+                    expect(result).toNot(beNil())
+                }
+            }
         }
     }
 }
