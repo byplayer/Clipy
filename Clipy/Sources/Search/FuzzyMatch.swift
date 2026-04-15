@@ -18,6 +18,30 @@ struct FuzzyMatchResult {
 func fuzzyMatch(query: String, target: String) -> FuzzyMatchResult? {
     guard !query.isEmpty, !target.isEmpty else { return nil }
 
+    // Split query by spaces into words, ignoring empty strings from extra spaces
+    let words = query.split(separator: " ").map(String.init)
+    guard !words.isEmpty else { return nil }
+
+    // If multiple words, match each independently and combine results
+    if words.count > 1 {
+        var totalScore = 0
+        var allIndices = [Int]()
+        for word in words {
+            guard let result = fuzzyMatchSingle(query: word, target: target) else {
+                return nil
+            }
+            totalScore += result.score
+            allIndices.append(contentsOf: result.matchedIndices)
+        }
+        return FuzzyMatchResult(score: totalScore, matchedIndices: allIndices.sorted())
+    }
+
+    return fuzzyMatchSingle(query: query, target: target)
+}
+
+private func fuzzyMatchSingle(query: String, target: String) -> FuzzyMatchResult? {
+    guard !query.isEmpty, !target.isEmpty else { return nil }
+
     let queryChars = Array(query.lowercased())
     let targetLower = target.lowercased()
     let targetChars = Array(targetLower)
