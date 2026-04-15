@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.1.0] - 2026-04-15
+
+### Features
+
+- Support multi-word fuzzy match queries in search window
+
+### Bug Fixes
+
+- Enable single-click to paste from search dialog
+
 ## [2.0.1] - 2026-03-26
 
 ### Bug Fixes
