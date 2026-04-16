@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.2.0] - 2026-04-16
+
+### Features
+
+- Replace fuzzy matching algorithm with fzf's FuzzyMatchV2 (ported from junegunn/fzf)
+  - Dynamic programming based optimal alignment instead of greedy matching
+  - Smart case: case-insensitive when query is all lowercase, case-sensitive when query contains uppercase
+  - Improved scoring with camelCase bonus, word boundary bonus, and first character multiplier
+  - fzf-compatible scoring constants (scoreMatch=16, bonusBoundary=8, bonusCamel123=7, etc.)
+
 ## [2.1.0] - 2026-04-15
 
 ### Features
