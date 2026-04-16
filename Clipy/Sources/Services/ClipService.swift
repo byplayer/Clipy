@@ -23,7 +23,7 @@ final class ClipService {
     // MARK: - Properties
     fileprivate var cachedChangeCount = BehaviorRelay<Int>(value: 0)
     fileprivate var storeTypes = [String: NSNumber]()
-    fileprivate let scheduler = SerialDispatchQueueScheduler(qos: .userInteractive)
+    fileprivate let scheduler = SerialDispatchQueueScheduler(qos: .utility)
     fileprivate let lock = NSRecursiveLock(name: "com.clipy-app.Clipy.ClipUpdatable")
     fileprivate var disposeBag = DisposeBag()
 
@@ -31,7 +31,7 @@ final class ClipService {
     func startMonitoring() {
         disposeBag = DisposeBag()
         // Pasteboard observe timer
-        Observable<Int>.interval(.microseconds(750), scheduler: scheduler)
+        Observable<Int>.interval(.milliseconds(250), scheduler: scheduler)
             .map { _ in NSPasteboard.general.changeCount }
             .withLatestFrom(cachedChangeCount.asObservable()) { ($0, $1) }
             .filter { $0 != $1 }

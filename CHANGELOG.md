@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.0] - 2026-04-16
+
+### Improvements
+
+- Reduce clipboard polling interval from 750μs to 250ms to drastically lower idle CPU usage
+- Lower clipboard monitoring thread priority from `.userInteractive` to `.utility`
+
 ## [2.2.1] - 2026-04-16
 
 ### Refactoring
