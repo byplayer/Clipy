@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.1] - 2026-04-16
+
+### Refactoring
+
+- Fix swiftlint `for_where` violations in FuzzyMatch.swift by converting to `while` loops and `where` clauses
+- Fix swiftlint `function_body_length` violation by splitting FuzzyMatchSpec into FuzzyMatchBasicSpec and FuzzyMatchScoringSpec
+
 ## [2.2.0] - 2026-04-16
 
 ### Features
