@@ -148,7 +148,8 @@ private func fuzzyMatchSingle(query: String, target: String) -> FuzzyMatchResult
     // --- Phase 1: Forward scan to find if all pattern chars exist & find end bound ---
     var endIdx = -1
     var queryIdx = 0
-    for textIdx in 0..<textLen {
+    var textIdx = 0
+    while textIdx < textLen {
         if charsEqual(queryChars[queryIdx], targetChars[textIdx], caseSensitive: caseSensitive) {
             queryIdx += 1
             if queryIdx == patternLen {
@@ -156,18 +157,21 @@ private func fuzzyMatchSingle(query: String, target: String) -> FuzzyMatchResult
                 break
             }
         }
+        textIdx += 1
     }
     guard queryIdx == patternLen else { return nil }
 
     // --- Phase 1b: Reverse scan to find start bound ---
     var startIdx = endIdx
     queryIdx = patternLen - 1
-    for textIdx in stride(from: endIdx, through: 0, by: -1) {
+    textIdx = endIdx
+    while textIdx >= 0 {
         if charsEqual(queryChars[queryIdx], targetChars[textIdx], caseSensitive: caseSensitive) {
             startIdx = textIdx
             queryIdx -= 1
             if queryIdx < 0 { break }
         }
+        textIdx -= 1
     }
 
     let width = endIdx - startIdx + 1
@@ -250,11 +254,10 @@ private func fuzzyMatchSingle(query: String, target: String) -> FuzzyMatchResult
     // --- Phase 3b: Find best score in last row ---
     var bestScore = 0
     var bestCol = -1
-    for col in 0..<width {
-        if scoreMatrix[patternLen - 1][col] > bestScore {
-            bestScore = scoreMatrix[patternLen - 1][col]
-            bestCol = col
-        }
+    let lastRow = scoreMatrix[patternLen - 1]
+    for col in 0..<width where lastRow[col] > bestScore {
+        bestScore = lastRow[col]
+        bestCol = col
     }
 
     guard bestScore > 0, bestCol >= 0 else { return nil }
