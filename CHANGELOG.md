@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.3.1] - 2026-04-30
+
+### Bug Fixes
+
+- Fix Enter key not selecting candidate when search result list has focus (e.g. after pressing Tab from the search field)
+
 ## [2.3.0] - 2026-04-16
 
 ### Improvements
