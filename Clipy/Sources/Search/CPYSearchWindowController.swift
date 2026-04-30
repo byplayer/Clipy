@@ -55,8 +55,8 @@ final class CPYSearchWindowController: NSObject {
         return scroll
     }()
 
-    private lazy var tableView: NSTableView = {
-        let table = NSTableView()
+    private lazy var tableView: SearchResultTableView = {
+        let table = SearchResultTableView()
         table.headerView = nil
         table.rowHeight = 32
         table.intercellSpacing = NSSize(width: 0, height: 0)
@@ -66,6 +66,12 @@ final class CPYSearchWindowController: NSObject {
         table.target = self
         table.action = #selector(tableViewSingleClicked)
         table.doubleAction = #selector(tableViewDoubleClicked)
+        table.onEnterKeyPressed = { [weak self] in
+            self?.selectCurrentItem()
+        }
+        table.onEscapeKeyPressed = { [weak self] in
+            self?.closeSearchWindow()
+        }
 
         let column = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("ResultColumn"))
         column.width = 580
@@ -450,5 +456,26 @@ extension CPYSearchWindowController: NSTableViewDelegate {
         ])
 
         return cell
+    }
+}
+
+// MARK: - SearchResultTableView
+final class SearchResultTableView: NSTableView {
+
+    var onEnterKeyPressed: (() -> Void)?
+    var onEscapeKeyPressed: (() -> Void)?
+
+    override func keyDown(with event: NSEvent) {
+        // Return (36) or numpad Enter (76)
+        if event.keyCode == 36 || event.keyCode == 76 {
+            onEnterKeyPressed?()
+            return
+        }
+        // Escape (53)
+        if event.keyCode == 53 {
+            onEscapeKeyPressed?()
+            return
+        }
+        super.keyDown(with: event)
     }
 }
