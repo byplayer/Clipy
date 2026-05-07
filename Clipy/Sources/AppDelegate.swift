@@ -190,10 +190,15 @@ extension AppDelegate: NSApplicationDelegate {
         }
 
         // Sparkle
-        let updater = updaterController.updater
-        updater.automaticallyChecksForUpdates = AppEnvironment.current.defaults.bool(forKey: Constants.Update.enableAutomaticCheck)
-        updater.updateCheckInterval = TimeInterval(AppEnvironment.current.defaults.integer(forKey: Constants.Update.checkInterval))
-        updaterController.startUpdater()
+        // Skip during XCTest runs: Sparkle aborts the host app on launch when the
+        // bundle lacks an EdDSA signing key, preventing the test bundle from being
+        // injected ("Test runner never began executing tests after launching").
+        if !isRunningTests {
+            let updater = updaterController.updater
+            updater.automaticallyChecksForUpdates = AppEnvironment.current.defaults.bool(forKey: Constants.Update.enableAutomaticCheck)
+            updater.updateCheckInterval = TimeInterval(AppEnvironment.current.defaults.integer(forKey: Constants.Update.checkInterval))
+            updaterController.startUpdater()
+        }
 
         // Binding Events
         bind()
