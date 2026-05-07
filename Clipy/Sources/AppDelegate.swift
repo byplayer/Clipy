@@ -153,6 +153,8 @@ class AppDelegate: NSObject, NSMenuItemValidation {
     }
 
     private func toggleAddingToLoginItems(_ isEnable: Bool) {
+        // テスト実行中はログイン項目を変更しない
+        if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil { return }
         let appPath = Bundle.main.bundlePath
         LoginServiceKit.removeLoginItems(at: appPath)
         guard isEnable else { return }
@@ -175,27 +177,43 @@ extension AppDelegate: NSApplicationDelegate {
         CPYUtilities.registerUserDefaultKeys()
         // SDKs
         CPYUtilities.initSDKs()
+        let isRunningTests = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+
         // Check Accessibility Permission
-        AppEnvironment.current.accessibilityService.isAccessibilityEnabled(isPrompt: true)
+        if !isRunningTests {
+            AppEnvironment.current.accessibilityService.isAccessibilityEnabled(isPrompt: true)
+        }
 
         // Show Login Item
-        if !AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.loginItem) && !AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.suppressAlertForLoginItem) {
+        if !isRunningTests && !AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.loginItem) && !AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.suppressAlertForLoginItem) {
             promptToAddLoginItems()
         }
 
         // Sparkle
-        let updater = updaterController.updater
-        updater.automaticallyChecksForUpdates = AppEnvironment.current.defaults.bool(forKey: Constants.Update.enableAutomaticCheck)
-        updater.updateCheckInterval = TimeInterval(AppEnvironment.current.defaults.integer(forKey: Constants.Update.checkInterval))
-        updaterController.startUpdater()
+        // Skip during XCTest runs: Sparkle aborts the host app on launch when the
+        // bundle lacks an EdDSA signing key, preventing the test bundle from being
+        // injected ("Test runner never began executing tests after launching").
+        if !isRunningTests {
+            let updater = updaterController.updater
+            updater.automaticallyChecksForUpdates = AppEnvironment.current.defaults.bool(forKey: Constants.Update.enableAutomaticCheck)
+            updater.updateCheckInterval = TimeInterval(AppEnvironment.current.defaults.integer(forKey: Constants.Update.checkInterval))
+            updaterController.startUpdater()
+        }
 
         // Binding Events
         bind()
 
         // Services
-        AppEnvironment.current.clipService.startMonitoring()
-        AppEnvironment.current.dataCleanService.startMonitoring()
-        AppEnvironment.current.excludeAppService.startMonitoring()
+        // Skip monitors during XCTest runs: ClipService polls NSPasteboard and writes
+        // through `try! Realm()` (default config), which during tests points at the
+        // in-memory Realm whose identifier is rewritten in each spec's beforeEach.
+        // External pasteboard changes would otherwise add stray clips to the test
+        // Realm and break expectations like ClipServiceSpec's Import test.
+        if !isRunningTests {
+            AppEnvironment.current.clipService.startMonitoring()
+            AppEnvironment.current.dataCleanService.startMonitoring()
+            AppEnvironment.current.excludeAppService.startMonitoring()
+        }
         AppEnvironment.current.hotKeyService.setupDefaultHotKeys()
 
         // Managers

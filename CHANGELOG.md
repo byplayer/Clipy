@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.4.1] - 2026-05-07
+
+### Bug Fixes
+
+- Skip accessibility permission prompt and login item registration when running unit tests (detected via `XCTestConfigurationFilePath`), preventing the test host app from being added to Login Items.
+- Skip `ClipService`/`DataCleanService`/`ExcludeAppService` background monitors when the host app launches under XCTest, fixing flaky `ClipServiceSpec.Import__Import_clipboard` failures (`got <11>` instead of `<10>`). The pasteboard monitor was writing stray clips into each spec's in-memory Realm via the shared `Realm.Configuration.defaultConfiguration`.
+- Skip Sparkle `startUpdater()` during XCTest runs. The unsigned debug build trips Sparkle's EdDSA-key fatal check, which terminated the test host before XCTest could inject (`Test runner never began executing tests after launching`).
+
 ## [2.4.0] - 2026-05-07
 
 ### Features
