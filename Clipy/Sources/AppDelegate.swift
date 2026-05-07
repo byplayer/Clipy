@@ -199,9 +199,16 @@ extension AppDelegate: NSApplicationDelegate {
         bind()
 
         // Services
-        AppEnvironment.current.clipService.startMonitoring()
-        AppEnvironment.current.dataCleanService.startMonitoring()
-        AppEnvironment.current.excludeAppService.startMonitoring()
+        // Skip monitors during XCTest runs: ClipService polls NSPasteboard and writes
+        // through `try! Realm()` (default config), which during tests points at the
+        // in-memory Realm whose identifier is rewritten in each spec's beforeEach.
+        // External pasteboard changes would otherwise add stray clips to the test
+        // Realm and break expectations like ClipServiceSpec's Import test.
+        if !isRunningTests {
+            AppEnvironment.current.clipService.startMonitoring()
+            AppEnvironment.current.dataCleanService.startMonitoring()
+            AppEnvironment.current.excludeAppService.startMonitoring()
+        }
         AppEnvironment.current.hotKeyService.setupDefaultHotKeys()
 
         // Managers
