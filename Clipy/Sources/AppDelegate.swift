@@ -153,6 +153,8 @@ class AppDelegate: NSObject, NSMenuItemValidation {
     }
 
     private func toggleAddingToLoginItems(_ isEnable: Bool) {
+        // テスト実行中はログイン項目を変更しない
+        if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil { return }
         let appPath = Bundle.main.bundlePath
         LoginServiceKit.removeLoginItems(at: appPath)
         guard isEnable else { return }
@@ -175,11 +177,15 @@ extension AppDelegate: NSApplicationDelegate {
         CPYUtilities.registerUserDefaultKeys()
         // SDKs
         CPYUtilities.initSDKs()
+        let isRunningTests = ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+
         // Check Accessibility Permission
-        AppEnvironment.current.accessibilityService.isAccessibilityEnabled(isPrompt: true)
+        if !isRunningTests {
+            AppEnvironment.current.accessibilityService.isAccessibilityEnabled(isPrompt: true)
+        }
 
         // Show Login Item
-        if !AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.loginItem) && !AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.suppressAlertForLoginItem) {
+        if !isRunningTests && !AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.loginItem) && !AppEnvironment.current.defaults.bool(forKey: Constants.UserDefaults.suppressAlertForLoginItem) {
             promptToAddLoginItems()
         }
 

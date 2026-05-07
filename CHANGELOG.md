@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.4.1] - 2026-05-07
+
+### Bug Fixes
+
+- Skip accessibility permission prompt and login item registration when running unit tests (detected via `XCTestConfigurationFilePath`), preventing the test host app from being added to Login Items.
+
 ## [2.4.0] - 2026-05-07
 
 ### Features
