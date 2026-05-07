@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.4.0] - 2026-05-07
+
+### Features
+
+- Allow deleting clipboard history items from the search window: press Tab to move focus to the result list, then press Delete or Forward Delete to remove the selected clip. Press Tab again to return focus to the search field.
+
+### Refactoring
+
+- Split `CPYSearchWindowController.swift` into `CPYSearchWindowController.swift`, `CPYSearchWindowController+TableView.swift`, and `SearchResultTableView.swift` to satisfy swiftlint `file_length` rule.
+
 ## [2.3.1] - 2026-04-30
 
 ### Bug Fixes

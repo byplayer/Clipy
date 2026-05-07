@@ -17,7 +17,7 @@ final class CPYSearchWindowController: NSObject {
     static let shared = CPYSearchWindowController()
 
     private let searchService = SearchService()
-    private var results = [SearchResultItem]()
+    var results = [SearchResultItem]()
     private var previousApp: NSRunningApplication?
     private var debounceWorkItem: DispatchWorkItem?
 
@@ -71,6 +71,13 @@ final class CPYSearchWindowController: NSObject {
         }
         table.onEscapeKeyPressed = { [weak self] in
             self?.closeSearchWindow()
+        }
+        table.onDeleteKeyPressed = { [weak self] in
+            self?.deleteCurrentItem()
+        }
+        table.onTabKeyPressed = { [weak self] in
+            guard let self = self else { return }
+            self.panel.makeFirstResponder(self.searchField)
         }
 
         let column = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("ResultColumn"))
@@ -282,6 +289,40 @@ final class CPYSearchWindowController: NSObject {
         }
     }
 
+    // MARK: - Deletion
+    private func deleteCurrentItem() {
+        let row = tableView.selectedRow
+        guard row >= 0 && row < results.count else {
+            NSSound.beep()
+            return
+        }
+        let item = results[row]
+        guard item.type == .clip else {
+            NSSound.beep()
+            return
+        }
+
+        let realm = try! Realm()
+        guard let clip = realm.object(ofType: CPYClip.self, forPrimaryKey: item.primaryKey) else {
+            NSSound.beep()
+            return
+        }
+        AppEnvironment.current.clipService.delete(with: clip)
+
+        results.remove(at: row)
+        tableView.reloadData()
+
+        if results.isEmpty {
+            previewPanel.orderOut(nil)
+            panel.makeFirstResponder(searchField)
+        } else {
+            let nextRow = min(row, results.count - 1)
+            tableView.selectRowIndexes(IndexSet(integer: nextRow), byExtendingSelection: false)
+            tableView.scrollRowToVisible(nextRow)
+            updatePreview()
+        }
+    }
+
     // MARK: - Preview
     private func needsPreview(_ item: SearchResultItem) -> Bool {
         let content = item.fullContent
@@ -298,7 +339,7 @@ final class CPYSearchWindowController: NSObject {
         return false
     }
 
-    private func updatePreview() {
+    func updatePreview() {
         let row = tableView.selectedRow
         guard row >= 0 && row < results.count else {
             previewPanel.orderOut(nil)
@@ -368,114 +409,15 @@ extension CPYSearchWindowController: NSTextFieldDelegate {
             closeSearchWindow()
             return true
         }
+        if commandSelector == #selector(NSResponder.insertTab(_:)) {
+            if !results.isEmpty {
+                if tableView.selectedRow < 0 {
+                    tableView.selectRowIndexes(IndexSet(integer: 0), byExtendingSelection: false)
+                }
+                panel.makeFirstResponder(tableView)
+            }
+            return true
+        }
         return false
-    }
-}
-
-// MARK: - NSTableViewDataSource
-extension CPYSearchWindowController: NSTableViewDataSource {
-    func numberOfRows(in tableView: NSTableView) -> Int {
-        return results.count
-    }
-}
-
-// MARK: - NSTableViewDelegate
-extension CPYSearchWindowController: NSTableViewDelegate {
-    func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
-        guard row < results.count else { return nil }
-        let item = results[row]
-
-        let cellIdentifier = NSUserInterfaceItemIdentifier("SearchResultCell")
-        let cell: NSTableCellView
-        if let reused = tableView.makeView(withIdentifier: cellIdentifier, owner: nil) as? NSTableCellView {
-            cell = reused
-        } else {
-            cell = makeResultCellView(identifier: cellIdentifier)
-        }
-
-        // Configure
-        let typeIcon: String
-        switch item.type {
-        case .clip:
-            typeIcon = "📋"
-        case .snippet:
-            typeIcon = "📝"
-        }
-
-        cell.textField?.stringValue = "\(typeIcon)  \(item.title)"
-
-        if let subtitleField = cell.viewWithTag(100) as? NSTextField {
-            subtitleField.stringValue = item.subtitle
-            subtitleField.isHidden = item.subtitle.isEmpty
-        }
-
-        return cell
-    }
-
-    func tableViewSelectionDidChange(_ notification: Notification) {
-        updatePreview()
-    }
-
-    func tableView(_ tableView: NSTableView, heightOfRow row: Int) -> CGFloat {
-        guard row < results.count else { return 32 }
-        let item = results[row]
-        return item.subtitle.isEmpty ? 28 : 44
-    }
-
-    private func makeResultCellView(identifier: NSUserInterfaceItemIdentifier) -> NSTableCellView {
-        let cell = NSTableCellView()
-        cell.identifier = identifier
-
-        let titleField = NSTextField(labelWithString: "")
-        titleField.font = NSFont.systemFont(ofSize: 13)
-        titleField.lineBreakMode = .byTruncatingTail
-        titleField.maximumNumberOfLines = 1
-        titleField.cell?.truncatesLastVisibleLine = true
-        titleField.translatesAutoresizingMaskIntoConstraints = false
-        cell.addSubview(titleField)
-        cell.textField = titleField
-
-        let subtitleField = NSTextField(labelWithString: "")
-        subtitleField.font = NSFont.systemFont(ofSize: 11)
-        subtitleField.textColor = .secondaryLabelColor
-        subtitleField.lineBreakMode = .byTruncatingTail
-        subtitleField.maximumNumberOfLines = 1
-        subtitleField.cell?.truncatesLastVisibleLine = true
-        subtitleField.translatesAutoresizingMaskIntoConstraints = false
-        subtitleField.tag = 100
-        cell.addSubview(subtitleField)
-
-        NSLayoutConstraint.activate([
-            titleField.topAnchor.constraint(equalTo: cell.topAnchor, constant: 4),
-            titleField.leadingAnchor.constraint(equalTo: cell.leadingAnchor, constant: 12),
-            titleField.trailingAnchor.constraint(equalTo: cell.trailingAnchor, constant: -12),
-
-            subtitleField.topAnchor.constraint(equalTo: titleField.bottomAnchor, constant: 1),
-            subtitleField.leadingAnchor.constraint(equalTo: cell.leadingAnchor, constant: 36),
-            subtitleField.trailingAnchor.constraint(equalTo: cell.trailingAnchor, constant: -12)
-        ])
-
-        return cell
-    }
-}
-
-// MARK: - SearchResultTableView
-final class SearchResultTableView: NSTableView {
-
-    var onEnterKeyPressed: (() -> Void)?
-    var onEscapeKeyPressed: (() -> Void)?
-
-    override func keyDown(with event: NSEvent) {
-        // Return (36) or numpad Enter (76)
-        if event.keyCode == 36 || event.keyCode == 76 {
-            onEnterKeyPressed?()
-            return
-        }
-        // Escape (53)
-        if event.keyCode == 53 {
-            onEscapeKeyPressed?()
-            return
-        }
-        super.keyDown(with: event)
     }
 }
